@@ -1,12 +1,130 @@
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>3D Cube</title>
-  
-  <link rel="manifest" href="manifest.json">
-  
-  <style>
-    ... your styles here ...
-  </style>
-  </head>
+<html style="margin:0;padding:0;background:#0b0f1a;height:100%;overflow:hidden;">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+(function(){
+  var s=document.createElement('style');
+  s.textContent=`
+  *{box-sizing:border-box;touch-action:none;user-select:none;-webkit-user-select:none;}
+  .scene{
+    width:100vw;height:100vh;
+    display:flex;align-items:center;justify-content:center;
+    perspective:900px;perspective-origin:50% 50%;
+    cursor:grab;
+  }
+  .scene:active{cursor:grabbing;}
+  .cube{
+    position:relative;width:180px;height:180px;
+    transform-style:preserve-3d;
+    will-change:transform;
+  }
+  .face{
+    position:absolute;inset:0;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Inter',sans-serif;font-weight:700;font-size:22px;
+    color:#fff;border:2px solid rgba(255,255,255,.25);
+    border-radius:14px;backdrop-filter:blur(2px);
+    box-shadow:inset 0 0 40px rgba(255,255,255,.15);
+  }
+  .front {background:rgba(99,102,241,.75); transform:translateZ(90px);}
+  .back  {background:rgba(236,72,153,.75); transform:rotateY(180deg) translateZ(90px);}
+  .right {background:rgba(16,185,129,.75); transform:rotateY(90deg)  translateZ(90px);}
+  .left  {background:rgba(245,158,11,.75); transform:rotateY(-90deg) translateZ(90px);}
+  .top   {background:rgba(59,130,246,.75); transform:rotateX(90deg)  translateZ(90px);}
+  .bottom{background:rgba(239,68,68,.75); transform:rotateX(-90deg) translateZ(90px);}
+  `;
+  document.head.appendChild(s);
+})();
+</script>
+
+<div class="scene" id="scene">
+  <div class="cube" id="cube">
+    <div class="face front">1</div>
+    <div class="face back">2</div>
+    <div class="face right">3</div>
+    <div class="face left">4</div>
+    <div class="face top">5</div>
+    <div class="face bottom">6</div>
+  </div>
+</div>
+
+<div class="fixed top-4 left-1/2 -translate-x-1/2 text-white/70 text-xs sm:text-sm font-medium tracking-wide bg-white/5 px-4 py-2 rounded-full border border-white/10 backdrop-blur">
+  🎲 Drag cube to spin · Let go = keeps rotating · Idle = random auto spin
+</div>
+
+<script>
+(function(){
+  const cube = document.getElementById('cube');
+  const scene = document.getElementById('scene');
+
+  // ===== STATE =====
+  let rotX = -20, rotY = 30;          // current cube rotation
+  let velX = 0, velY = 0;              // throw / inertia velocity
+  let isDragging = false;
+  let lastX = 0, lastY = 0;
+  let autoMode = true;                 // random auto rotation when idle
+  let autoSpeedX = 0.3, autoSpeedY = 0.5; // drifting auto speeds
+  let idleTimer = null;
+
+  // ===== RANDOM AUTO SPIN (smooth drift, never jerky) =====
+  function randomizeAutoSpeed() {
+    autoSpeedX = (Math.random() - 0.5) * 1.2; // -0.6 .. 0.6
+    autoSpeedY = (Math.random() - 0.5) * 1.6; // -0.8 .. 0.8
+  }
+  setInterval(randomizeAutoSpeed, 2200); // change direction smoothly every ~2s
+  randomizeAutoSpeed();
+
+  // ===== POINTER EVENTS (mouse + touch unified) =====
+  cube.addEventListener('pointerdown', (e) => {
+    isDragging = true;
+    autoMode = false;              // STOP AUTO ROTATION the second you touch it
+    velX = 0; velY = 0;            // kill inertia
+    lastX = e.clientX; lastY = e.clientY;
+    cube.setPointerCapture(e.pointerId);
+    clearTimeout(idleTimer);
+    e.preventDefault();
+  });
+
+  window.addEventListener('pointermove', (e) => {
+    if (!isDragging) return;
+    const dx = e.clientX - lastX;
+    const dy = e.clientY - lastY;
+    lastX = e.clientX; lastY = e.clientY;
+
+    rotY += dx * 0.5;              // horizontal drag → Y rotation
+    rotX -= dy * 0.5;              // vertical drag → X rotation
+    velX = -dy * 0.15;             // track velocity for THROW on release
+    velY =  dx * 0.15;
+  });
+
+  window.addEventListener('pointerup', (e) => {
+    if (!isDragging) return;
+    isDragging = false;
+    // after you let go: INERTIA keeps spinning in the direction you threw it
+    // then after 3.5s of no touch → blend back to random auto rotation
+    idleTimer = setTimeout(() => { autoMode = true; }, 3500);
+  });
+
+  // ===== ANIMATION LOOP =====
+  function tick() {
+    if (autoMode && !isDragging) {
+      // IDLE: smooth random auto rotation — cube stays CENTERED
+      rotX += autoSpeedX;
+      rotY += autoSpeedY;
+    } else if (!isDragging) {
+      // THROW / INERTIA: keeps rotating where you threw it, slows gently
+      rotX += velX;
+      rotY += velY;
+      velX *= 0.985;   // friction so it doesn't spin forever
+      velY *= 0.985;
+    }
+
+    // APPLY ROTATION ONLY — NEVER MOVES FROM CENTER
+    cube.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+</script>
+  </html>
   
