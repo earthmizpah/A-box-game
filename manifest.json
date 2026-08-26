@@ -1,11 +1,12 @@
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>3D Cube</title>
-  
-  <link rel="manifest" href="manifest.json">
-  
-  <style>
-    ... your styles here ...
-  </style>
-</head>
+{
+  "background_color": "#ffffff",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "earthmizpah.github",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "earthmizpah.github",
+  "start_url": "/",
+  "theme_color": "#ffffff",
+  "description": "Spin and throw the 3D cube! Drag to rotate, let go to throw!"
+}
