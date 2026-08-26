@@ -1,12 +1,16 @@
 {
-  "background_color": "#ffffff",
-  "dir": "ltr",
+  "name": "3D Cube",
+  "short_name": "Cube",
+  "description": "Spin and throw the 3D cube!",
+  "start_url": "./index.html",
   "display": "standalone",
-  "name": "earthmizpah.github",
-  "orientation": "any",
-  "scope": "/",
-  "short_name": "earthmizpah.github",
-  "start_url": "/",
-  "theme_color": "#ffffff",
-  "description": "Spin and throw the 3D cube! Drag to rotate, let go to throw!"
+  "background_color": "#0b0f1a",
+  "theme_color": "#6366f1",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/1264/1264735.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
 }
