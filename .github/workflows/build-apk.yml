@@ -1,0 +1,24 @@
+name: Build Website APK
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build APK from Website
+        uses: sharadcodes/pwa-to-apk-action@v1.0.0
+        with:
+          app_name: "3D Cube"
+          website_url: "https://earthmizpah.github.io/A-box-game/"
+          package_name: "com.cube.game"
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: 3D-Cube-APK
+          path: "*.apk"
+          
